@@ -40,7 +40,7 @@ let concesionario = [
 
 // Lista todos los concesionario
 app.get("/concesionario", (request, response) => {
-  response.json(concesionarioconcesionario);
+  response.json(concesionario);
 });
 
 // Añadir un nuevo coche
