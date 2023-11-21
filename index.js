@@ -25,40 +25,48 @@ app.listen(port, () => {
 
 // Definimos una estructura de datos
 // (temporal hasta incorporar una base de datos)
-let coches = [
-  { marca: "Renault", modelo: "Clio" },
-  { marca: "Nissan", modelo: "Skyline R34" },
+let concesionario = [
+  {
+    nombre: "Bahiamocion",
+    direccion: "C/ FOntaneros Nº4",
+    coches: "Seat Leon, Cupra Formentor, Seat Arona, AUDI A6 50 TDI",
+  },
+  {
+    nombre: "Puerto Motor",
+    direccion: "Calle Estuario 14 Poligono Industrial Las Salinas",
+    coches: "BMW Serie 4 M4 Cabrio, Chevrolet Corvette C7, LAMBORGHINI Huracán",
+  },
 ];
 
-// Lista todos los coches
-app.get("/coches", (request, response) => {
-  response.json(coches);
+// Lista todos los concesionario
+app.get("/concesionario", (request, response) => {
+  response.json(concesionarioconcesionario);
 });
 
 // Añadir un nuevo coche
-app.post("/coches", (request, response) => {
-  coches.push(request.body);
+app.post("/concesionario", (request, response) => {
+  concesionario.push(request.body);
   response.json({ message: "ok" });
 });
 
 // Obtener un solo coche
-app.get("/coches/:id", (request, response) => {
+app.get("/concesionario/:id", (request, response) => {
   const id = request.params.id;
-  const result = coches[id];
+  const result = concesionario[id];
   response.json({ result });
 });
 
 // Actualizar un solo coche
-app.put("/coches/:id", (request, response) => {
+app.put("/concesionario/:id", (request, response) => {
   const id = request.params.id;
-  coches[id] = request.body;
+  concesionario[id] = request.body;
   response.json({ message: "ok" });
 });
 
 // Borrar un elemento del array
-app.delete("/coches/:id", (request, response) => {
+app.delete("/concesionario/:id", (request, response) => {
   const id = request.params.id;
-  coches = coches.filter((item) => coches.indexOf(item) !== id);
+  concesionario = concesionario.filter((item) => concesionario.indexOf(item) !== id);
 
   response.json({ message: "ok" });
 });
