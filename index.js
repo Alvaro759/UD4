@@ -89,14 +89,28 @@ app.post("/concesionario/:id/coches", (request, response) => {
 });
 
 // Obtiene el coche cuyo id sea cocheId, del concesionario pasado por id
-app.get("/concesionario/:id/coches/:idCoche", (request, response) => {
+app.get("/concesionario/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const concesionarioConcreto = concesionario[id];
 
-  const idCoche = request.params.idCoche;
+  const cocheId = request.params.cocheId;
   const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
 
-  const result = coches[idCoche];
+  const result = coches[cocheId];
 
   response.json({ result });
+});
+
+// Actualiza el coche cuyo id sea cocheId, del concesionario pasado por id
+app.put("/concesionario/:id/coches/:cocheId", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionario[id];
+
+  const cocheId = request.params.cocheId;
+  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+
+  coches[cocheId] = request.body.coches;
+  concesionarioConcreto.coches = coches.join(", ");
+
+  response.json({ message: "ok" });
 });
