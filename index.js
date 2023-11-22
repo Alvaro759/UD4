@@ -25,40 +25,106 @@ app.listen(port, () => {
 
 // Definimos una estructura de datos
 // (temporal hasta incorporar una base de datos)
-let coches = [
-  { marca: "Renault", modelo: "Clio" },
-  { marca: "Nissan", modelo: "Skyline R34" },
+let concesionarios = [
+  {
+    nombre: "Bahiamocion",
+    direccion: "C/ FOntaneros Nº4",
+    coches: "Seat Leon, Cupra Formentor, Seat Arona, AUDI A6 50 TDI",
+  },
+  {
+    nombre: "Puerto Motor",
+    direccion: "Calle Estuario 14 Poligono Industrial Las Salinas",
+    coches: "BMW Serie 4 M4 Cabrio, Chevrolet Corvette C7, LAMBORGHINI Huracán",
+  },
 ];
 
-// Lista todos los coches
-app.get("/coches", (request, response) => {
-  response.json(coches);
+// Lista todos los concesionarios
+app.get("/concesionarios", (request, response) => {
+  response.json(concesionarios);
 });
 
-// Añadir un nuevo coche
-app.post("/coches", (request, response) => {
-  coches.push(request.body);
+// Añadir un nuevo concesionarios
+app.post("/concesionarios", (request, response) => {
+  concesionarios.push(request.body);
   response.json({ message: "ok" });
 });
 
-// Obtener un solo coche
-app.get("/coches/:id", (request, response) => {
+// Obtener un solo concesionarios
+app.get("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  const result = coches[id];
+  const result = concesionarios[id];
   response.json({ result });
 });
 
-// Actualizar un solo coche
-app.put("/coches/:id", (request, response) => {
+// Actualizar un solo concesionarios
+app.put("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  coches[id] = request.body;
+  concesionarios[id] = request.body;
   response.json({ message: "ok" });
 });
 
 // Borrar un elemento del array
-app.delete("/coches/:id", (request, response) => {
+app.delete("/concesionarios/:id", (request, response) => {
   const id = request.params.id;
-  coches = coches.filter((item) => coches.indexOf(item) !== id);
+  concesionarios = concesionarios.filter((item, index) => index != id);
+  response.json({ message: "ok" });
+});
+
+// Obtener todos los coches de un concesionarios por id
+app.get("/concesionarios/:id/coches", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionarios[id];
+
+  const result = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+  response.json({ result });
+});
+
+// Añadir un nuevo coche al concesionarios
+app.post("/concesionarios/:id/coches", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionarios[id];
+
+  concesionarioConcreto.coches += `, ${request.body.coches}`;
+  response.json({ message: "ok" });
+});
+
+// Obtiene el coche cuyo id sea cocheId, del concesionarios pasado por id
+app.get("/concesionarios/:id/coches/:cocheId", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionarios[id];
+
+  const cocheId = request.params.cocheId;
+  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+
+  const result = coches[cocheId];
+
+  response.json({ result });
+});
+
+// Actualiza el coche cuyo id sea cocheId, del concesionarios pasado por id
+app.put("/concesionarios/:id/coches/:cocheId", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionarios[id];
+
+  const cocheId = request.params.cocheId;
+  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+
+  coches[cocheId] = request.body.coches;
+  concesionarioConcreto.coches = coches.join(", ");
+
+  response.json({ message: "ok" });
+});
+
+// Borra el coche cuyo id sea cocheId, del concesionarios pasado por id
+app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionarios[id];
+
+  const cocheId = request.params.cocheId;
+  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+
+  coches.splice(cocheId, 1);
+  concesionarioConcreto.coches = coches.join(", ");
 
   response.json({ message: "ok" });
 });
