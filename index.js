@@ -78,3 +78,12 @@ app.get("/concesionario/:id/coches", (request, response) => {
   const result = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
   response.json({ result });
 });
+
+// Añadir un nuevo coche al concesionario
+app.post("/concesionario/:id/coches", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionario[id];
+
+  concesionarioConcreto.coches += `, ${request.body.coches}`;
+  response.json({ message: "ok" });
+});
