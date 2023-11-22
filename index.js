@@ -40,23 +40,23 @@ let concesionario = [
 
 // Lista todos los concesionario
 app.get("/concesionario", (request, response) => {
-  response.json(concesionarioconcesionario);
+  response.json(concesionario);
 });
 
-// Añadir un nuevo coche
+// Añadir un nuevo concesionario
 app.post("/concesionario", (request, response) => {
   concesionario.push(request.body);
   response.json({ message: "ok" });
 });
 
-// Obtener un solo coche
+// Obtener un solo concesionario
 app.get("/concesionario/:id", (request, response) => {
   const id = request.params.id;
   const result = concesionario[id];
   response.json({ result });
 });
 
-// Actualizar un solo coche
+// Actualizar un solo concesionario
 app.put("/concesionario/:id", (request, response) => {
   const id = request.params.id;
   concesionario[id] = request.body;
@@ -66,7 +66,15 @@ app.put("/concesionario/:id", (request, response) => {
 // Borrar un elemento del array
 app.delete("/concesionario/:id", (request, response) => {
   const id = request.params.id;
-  concesionario = concesionario.filter((item) => concesionario.indexOf(item) !== id);
-
+  concesionario = concesionario.filter((item, index) => index != id);
   response.json({ message: "ok" });
+});
+
+// Obtener todos los coches de un concesionario por id
+app.get("/concesionario/:id/coches", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionario[id];
+
+  const result = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+  response.json({ result });
 });
