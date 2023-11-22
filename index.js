@@ -87,3 +87,16 @@ app.post("/concesionario/:id/coches", (request, response) => {
   concesionarioConcreto.coches += `, ${request.body.coches}`;
   response.json({ message: "ok" });
 });
+
+// Obtiene el coche cuyo id sea cocheId, del concesionario pasado por id
+app.get("/concesionario/:id/coches/:idCoche", (request, response) => {
+  const id = request.params.id;
+  const concesionarioConcreto = concesionario[id];
+
+  const idCoche = request.params.idCoche;
+  const coches = concesionarioConcreto.coches.split(",").map((coches) => coches.trim());
+
+  const result = coches[idCoche];
+
+  response.json({ result });
+});
