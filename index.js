@@ -28,7 +28,7 @@ app.listen(port, () => {
 let concesionarios = [
   {
     nombre: "Bahiamocion",
-    direccion: "C/ FOntaneros Nº4",
+    direccion: "C/ Fontaneros Nº4",
     coches: "Seat Leon, Cupra Formentor, Seat Arona, AUDI A6 50 TDI",
   },
   {
