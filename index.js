@@ -8,6 +8,7 @@
 // Importamos las bibliotecas necesarias.
 // Concretamente el framework express.
 const express = require("express");
+const mongoDB = require("mongodb");
 
 // Inicializamos la aplicación
 const app = express();
@@ -128,3 +129,25 @@ app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
 
   response.json({ message: "ok" });
 });
+
+// Conexión URL
+const url = "mongodb://localhost:27017";
+const client = new mongoDB.MongoClient(url);
+
+// Nombre de la base de datos
+const dbName = "Concesionarios";
+
+async function main() {
+  // Uso metodo connect para conectar al servidor
+  await client.connect();
+  console.log(`Conectado al servidor correctamente.`);
+  const db = client.db(dbName);
+  const collection = db.collection("concesionario");
+
+  return "Listo.";
+}
+
+main()
+  .then(console.log)
+  .catch(console.error)
+  .finally(() => client.close());
