@@ -32,7 +32,7 @@ db();
     "nombre": "Puerto Motor",
     "direccion": "Calle Estuario 14 Poligono Industrial Las Salinas",
     "coches": "BMW Serie 4 M4 Cabrio, Chevrolet Corvette C7, LAMBORGHINI Huracán"
-  },
+  }
 ];*/
 
 // Lista todos los concesionarios
