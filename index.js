@@ -4,12 +4,17 @@ const express = require("express");
 const mongoose = require("mongoose");
 const db = require("./db");
 const concesionariosSchema = require("./models/concesionarios");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 // Inicializamos la aplicación
 const app = express();
 
 //  Indicamos que la aplicación puede escribir JSON (API Rest)
 app.use(express.json());
+
+// Configuración de Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Indicamos el puerto en el que vamos a desplegar la aplicación
 const port = process.env.PORT || 8080;
@@ -23,15 +28,45 @@ db();
 // Definimos una estructura de datos
 // (temporal hasta incorporar una base de datos)
 /*let concesionarios = [
-  {
+{
     "nombre": "Bahiamocion",
     "direccion": "C/ Fontaneros Nº4",
-    "coches": "Seat Leon, Cupra Formentor, Seat Arona, AUDI A6 50 TDI"
-},
-  {
+    "coches": [
+        {
+            "marca": "Seat",
+            "modelo": "Leon"
+        },
+        {
+            "marca": "Cupra",
+            "modelo": "Formentor"
+        },
+        {
+            "marca": "Seat",
+            "modelo": "Arona"
+        },
+        {
+            "marca": "Audi",
+            "modelo": "A6 50 TDI"
+        }
+    ]
+  },
+   {
     "nombre": "Puerto Motor",
     "direccion": "Calle Estuario 14 Poligono Industrial Las Salinas",
-    "coches": "BMW Serie 4 M4 Cabrio, Chevrolet Corvette C7, LAMBORGHINI Huracán"
+    "coches": [
+      {
+        "marca": "BMW",
+        "modelo": "Serie M4 Cabrio"
+      },
+      {
+        "marca": "Chevrolet",
+        "modelo": "Covertte C7"
+      },
+      {
+        "marca": "Lamborghini",
+        "modelo": "Huracán"
+      }
+    ],
   }
 ];*/
 
@@ -92,26 +127,21 @@ app.get("/concesionarios/:id/coches", (request, response) => {
     .catch((error) => response.json({ message: error }));
 });
 
-
 // Añadir un nuevo coche al concesionario
 app.post("/concesionarios/:id/coches", (request, response) => {
   const id = request.params.id;
-  const { coches: cochesToAdd } = request.body;
+  const { marca, modelo } = request.body;
 
-  concesionariosSchema.findById(id)
+  concesionariosSchema
+    .findById(id)
     .then((concesionario) => {
       if (!concesionario) {
         return response.status(404).json({ message: "Concesionario no encontrado" });
       }
 
-      // Convertir la cadena de coches existente a un array
-      const cochesArray = concesionario.coches.split(',').map(coche => coche.trim());
-
-      // Agregar los nuevos coches al array existente
-      cochesArray.push(...cochesToAdd.split(','));
-
-      // Convertir el array de coches de nuevo a una cadena
-      concesionario.coches = cochesArray.join(', ');
+      // Agregar el nuevo coche al array existente
+      const nuevoCoche = { marca, modelo };
+      concesionario.coches.push(nuevoCoche);
 
       return concesionario.save();
     })
@@ -119,63 +149,70 @@ app.post("/concesionarios/:id/coches", (request, response) => {
     .catch((error) => response.status(500).json({ message: error }));
 });
 
-
-
 // Obtener el coche cuyo id sea cocheId, del concesionario pasado por id
 app.get("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const cocheId = request.params.cocheId;
 
-  concesionariosSchema.findById(id)
+  concesionariosSchema
+    .findById(id)
     .then((concesionario) => {
-      const cochesArray = concesionario.coches.split(',').map(coche => coche.trim());
-      
-      const coche = cochesArray[cocheId];
+      if (!concesionario) {
+        return response.status(404).json({ message: "Concesionario no encontrado" });
+      }
+
+      const coche = concesionario.coches[cocheId];
       response.json({ coche });
     })
     .catch((error) => response.json({ message: error }));
 });
 
-
 // Actualizar el coche cuyo id sea cocheId, del concesionario pasado por id
 app.put("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const cocheId = request.params.cocheId;
-  const { coches } = request.body;
+  const { marca, modelo } = request.body;
 
-  concesionariosSchema.findById(id)
+  concesionariosSchema
+    .findById(id)
     .then((concesionario) => {
-      const cochesArray = concesionario.coches.split(',').map(coche => coche.trim());
-      cochesArray[cocheId] = coches;
+      if (!concesionario) {
+        return response.status(404).json({ message: "Concesionario no encontrado" });
+      }
+
+      // Actualizar los datos del coche en el array existente
+      concesionario.coches[cocheId] = { marca, modelo };
 
       // Actualizar la propiedad 'coches' con el array modificado
-      concesionario.coches = cochesArray.join(', ');
-
       return concesionario.save();
     })
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
-
 
 // Borrar el coche cuyo id sea cocheId, del concesionario pasado por id
 app.delete("/concesionarios/:id/coches/:cocheId", (request, response) => {
   const id = request.params.id;
   const cocheId = request.params.cocheId;
 
-  concesionariosSchema.findById(id)
+  concesionariosSchema
+    .findById(id)
     .then((concesionario) => {
-      const cochesArray = concesionario.coches.split(',').map(coche => coche.trim());
+      if (!concesionario) {
+        return response.status(404).json({ message: "Concesionario no encontrado" });
+      }
+
+      // Verificar si el índice es válido
+      if (cocheId < 0 || cocheId >= concesionario.coches.length) {
+        return response.status(400).json({ message: "Índice de coche no válido" });
+      }
 
       // Eliminar el coche específico del array
-      cochesArray.splice(cocheId, 1);
+      concesionario.coches.splice(cocheId, 1);
 
       // Actualizar la propiedad 'coches' con el array modificado
-      concesionario.coches = cochesArray.join(', ');
-
       return concesionario.save();
-    })
+    }) 
     .then((data) => response.json(data))
     .catch((error) => response.json({ message: error }));
 });
-
